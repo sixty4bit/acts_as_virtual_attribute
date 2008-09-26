@@ -1,0 +1,40 @@
+ActsAsVirtualAttribute
+======================
+
+Acts As Virtual Attribute is a plugin released under the MIT license. It creates virtual attributes on
+ActiveRecord models using the pattern documented in The Pragmatic Programmers' Advanced Rails Recipes.
+
+Thanks to Ryan Bates for all of the swell examples he has created on Railscasts.com.
+
+Example
+=======
+
+class Project < ActiveRecord::Base
+
+  has_many :tasks, :dependent => :destroy
+  acts_as_virtual_attribute :tasks
+
+end
+
+<% fields_for_task task do |task_form| -%>
+  <p class="task">Task: <%= task_form.text_field :name %>
+     <%= link_to_remove_task "remove", ".task", task_form %>
+  </p>
+<% end -%>
+
+acts_as_virtual_attribute has created the following:
+* Project#new_task_attributes=(attributes) - used to set new task variables
+* Project#existing_task_attributes=(attributes) - used to set existing task
+    variables
+* Project#save_tasks - used to save tasks because Rails doesn't save child 
+    objects on update.
+* an after_update callback to Project#save_tasks - required because Rails 
+    doesn't save child objects on update
+* ProjectsHelper#fields_for_task(task, &block) - provide the field name for 
+    the fields_for in the form
+* ProjectsHelper#link_to_remove_task(name, container, form, &block) - 
+    provides a link to remove the current task 
+
+
+
+Copyright (c) 2008 Carl B. Fyffe, released under the MIT license
