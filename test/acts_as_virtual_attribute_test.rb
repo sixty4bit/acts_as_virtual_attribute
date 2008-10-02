@@ -52,6 +52,17 @@ class ActsAsVirtualAttributeTest < Test::Unit::TestCase
     t = Task.find fence_id
     assert "paint fence red" == t.name, "Name should be changed."
   end
+  
+  def test_saving_blank
+    p = Project.create :name => 'house chores'
+    p.tasks.create :name => 'paint fence'
+    p.save
+    assert_equal 0, p.tasks[0].errors.count
+    p = Project.find 1
+    p.new_tasks_attributes=([{"name" => ""}])
+    assert !p.save
+    assert_equal 1, p.tasks[1].errors.count
+  end
 
   def test_project_responds_to_remove_tasks_attributes
     t = Task.new
@@ -106,9 +117,11 @@ end
 
 class Task < ActiveRecord::Base
   belongs_to :project
+  validates_presence_of :name
 end
 
 class Project < ActiveRecord::Base
   has_many :tasks
   acts_as_virtual_attribute :tasks
+  validates_associated :tasks
 end
