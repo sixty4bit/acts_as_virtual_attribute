@@ -9,6 +9,7 @@ module Sixty4Bit
       module ClassMethods
         def acts_as_virtual_attribute(*args, &proc)
           property = args[0]
+          property_class_name = self.reflections[property].class_name
           class_eval <<-EOT
 
           after_update :save_#{property}
@@ -46,7 +47,7 @@ EOT
           end
 REMOVE_CODE
 
-          property.to_s.capitalize.singularize.constantize.class_eval(destroy_method)
+          property_class_name.constantize.class_eval(destroy_method)
 
           helper_method = <<HELPER_CODE
           def fields_for_#{property.to_s.singularize}(virt, &block)
@@ -64,7 +65,7 @@ REMOVE_CODE
           end
 HELPER_CODE
 
-          helper_name = self.name.pluralize + "Helper"
+          helper_name = self.class_name.pluralize + "Helper"
           helper_name.constantize.class_eval(helper_method)
 
           include Sixty4Bit::Acts::VirtualAttribute::InstanceMethods

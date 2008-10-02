@@ -12,6 +12,11 @@ class ActsAsVirtualAttributeTest < Test::Unit::TestCase
     p = Project.new
     assert p.respond_to?(:new_tasks_attributes=)
   end
+  
+  def test_picture_responds_to_new_colors_attributes
+    p = Art::Picture.new
+    assert p.respond_to?(:new_colors_attributes=)
+  end
 
   def test_adding_tasks_to_project
     p = Project.new
@@ -101,6 +106,17 @@ def setup_db
       t.integer :project_id
       t.timestamps
     end
+    
+    create_table :pictures do |t|
+      t.string :name
+      t.timestamps
+    end
+    
+    create_table :colors do |t|
+      t.string :name
+      t.integer :picture_id
+      t.timestamps
+    end
   end
 end
 
@@ -112,8 +128,7 @@ def cleanup_db
   end
 end
 
-module ProjectsHelper
-end
+module ProjectsHelper;end
 
 class Task < ActiveRecord::Base
   belongs_to :project
@@ -124,4 +139,21 @@ class Project < ActiveRecord::Base
   has_many :tasks
   acts_as_virtual_attribute :tasks
   validates_associated :tasks
+end
+
+module PicturesHelper;end
+
+module Art
+
+  class Color < ActiveRecord::Base
+    set_table_name :colors
+    belongs_to :picture, :class_name => "Art::Picture"
+  end
+
+  class Picture < ActiveRecord::Base
+    set_table_name :pictures
+    has_many :colors, :class_name => "Art::Color"
+    acts_as_virtual_attribute :colors
+  end
+
 end
