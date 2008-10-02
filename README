@@ -36,5 +36,16 @@ acts_as_virtual_attribute has created the following:
     provides a link to remove the current task 
 
 
+** Notes **
+If you are using namespaced models, it is expecting a helper for the name
+of the class. So if you have a model like:
+
+class Art::Picture < ActiveRecord::Base
+  has_many :colors, :class_name => "Art::Color"
+  acts_as_virtual_attribute :colors
+end
+
+then you will need to have a PicturesHelper. Be sure that it is loaded by
+the controller so you can use it in the view.
 
 Copyright (c) 2008 Carl B. Fyffe, released under the MIT license
